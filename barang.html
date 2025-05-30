@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mystical Message Reveal</title>
+    <style>
+         @import url('https://fonts.googleapis.com/css2?family=Creepster&family=Inter:wght@400;500;600&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a0f2e 50%, #0d1b2a 100%);
+            min-height: 100vh;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            position: relative;
+        }
+        
+        /* Animated background elements */
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+        
+        .star {
+            position: absolute;
+            background: #fff;
+            border-radius: 50%;
+            animation: twinkle 2s infinite alternate;
+        }
+        
+        @keyframes twinkle {
+            0% { opacity: 0.3; }
+            100% { opacity: 1; }
+        }
+        
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            min-height: 100vh;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .title {
+            font-family: 'Creepster', cursive;
+            font-size: 3rem;
+            color: #8b5cf6;
+            text-shadow: 0 0 20px #8b5cf6;
+            margin-bottom: 2rem;
+            text-align: center;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+        
+        @keyframes glow {
+            from { text-shadow: 0 0 20px #8b5cf6; }
+            to { text-shadow: 0 0 30px #8b5cf6, 0 0 40px #8b5cf6; }
+        }
+        
+        .brewing-area {
+            display: flex;
+            gap: 3rem;
+            align-items: flex-start;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .ingredients-panel {
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid #8b5cf6;
+            border-radius: 15px;
+            padding: 2rem;
+            min-width: 300px;
+            box-shadow: 0 0 30px rgba(139, 92, 246, 0.3);
+        }
+        
+        .ingredients-title {
+            font-family: 'Creepster', cursive;
+            color: #dc2626;
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+        
+        .ingredient {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            padding: 0.8rem;
+            background: rgba(139, 92, 246, 0.1);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        
+        .ingredient:hover {
+            background: rgba(139, 92, 246, 0.2);
+            border-color: #8b5cf6;
+            transform: translateY(-2px);
+        }
+        
+        .ingredient.added {
+            background: rgba(34, 197, 94, 0.2);
+            border-color: #22c55e;
+            opacity: 0.6;
+            pointer-events: none;
+        }
+        
+        .ingredient-icon {
+            font-size: 2rem;
+            width: 50px;
+            text-align: center;
+        }
+        
+        .ingredient-name {
+            color: #e5e7eb;
+            font-size: 1.1rem;
+            flex: 1;
+        }
+        
+        .cauldron-area {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .cauldron {
+            width: 200px;
+            height: 150px;
+            background: linear-gradient(to bottom, #374151 0%, #1f2937 100%);
+            border-radius: 0 0 50% 50%;
+            position: relative;
+            border: 4px solid #6b7280;
+            overflow: hidden;
+            box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.5);
+        }
+        
+        .cauldron::before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: -20px;
+            right: -20px;
+            height: 20px;
+            background: #6b7280;
+            border-radius: 10px;
+            border: 2px solid #4b5563;
+        }
+        
+        .potion {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 0;
+            background: linear-gradient(45deg, #7c3aed, #a855f7, #c084fc);
+            transition: height 1s ease-in-out;
+            border-radius: 0 0 50% 50%;
+        }
+        
+        .bubbles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+        
+        .bubble {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            animation: bubble-rise 3s infinite linear;
+        }
+        
+        @keyframes bubble-rise {
+            0% {
+                bottom: 0;
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                bottom: 100%;
+                opacity: 0;
+            }
+        }
+        
+        .progress {
+            margin-top: 1rem;
+            color: #8b5cf6;
+            font-size: 1.2rem;
+            text-align: center;
+        }
+        
+        .message-reveal {
+    display: none;
+    background: rgba(10, 10, 10, 0.95);
+    border: 3px solid #ffd700;
+    border-radius: 20px;
+    padding: 2rem;
+    margin: 2rem auto;
+    text-align: left;
+    box-shadow: 0 0 40px rgba(255, 215, 0, 0.5);
+    animation: reveal 1.5s ease-in-out;
+    max-width: 800px;
+    max-height: 80vh;
+    overflow-y: auto;
+    color: #f1f1f1;
+    font-family: 'Segoe UI', sans-serif;
+    line-height: 1.6;
+    scrollbar-width: thin;
+    scrollbar-color: #ffd700 #333;
+}
+
+.message-reveal::-webkit-scrollbar {
+    width: 8px;
+}
+
+.message-reveal::-webkit-scrollbar-thumb {
+    background-color: #ffd700;
+    border-radius: 8px;
+}
+
+.message-reveal::-webkit-scrollbar-track {
+    background-color: #333;
+}
+
+.message-title {
+    font-size: 1.8rem;
+    color: #ffd700;
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+.message-content {
+    font-size: 1rem;
+    white-space: pre-wrap;
+}
+
+.reset-btn {
+    margin-top: 2rem;
+    padding: 0.6rem 1.2rem;
+    font-size: 1rem;
+    border: none;
+    border-radius: 10px;
+    background-color: #ffd700;
+    color: #000;
+    cursor: pointer;
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.8);
+    transition: background-color 0.3s ease;
+}
+
+.reset-btn:hover {
+    background-color: #e6c200;
+}
+
+.quote-box {
+    background: rgba(10, 10, 10, 0.95);
+    border: 2px solid #ffd700;
+    border-radius: 16px;
+    padding: 1.5rem 2rem;
+    margin: 2rem auto;
+    text-align: center;
+    box-shadow: 0 0 25px rgba(255, 215, 0, 0.4);
+    max-width: 600px;
+    color: #f1f1f1;
+    font-family: 'Segoe UI', sans-serif;
+    font-size: 1.2rem;
+    line-height: 1.6;
+    animation: fadeIn 1.2s ease-in-out;
+}
+
+.quote-box::before,
+.quote-box::after {
+    content: '"';
+    color: #ffd700;
+    font-size: 2rem;
+    vertical-align: top;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+.quote-box p:last-child {
+    font-style: italic;
+    text-align: right;
+    font-size: 1rem;
+    color: #ffd700;
+}
+
+
+        
+        @keyframes reveal {
+            0% {
+                opacity: 0;
+                transform: scale(0.5) rotateY(90deg);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1) rotateY(0deg);
+            }
+        }
+        
+        .message-title {
+            font-family: 'Creepster', cursive;
+            color: #ffd700;
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            animation: golden-glow 2s ease-in-out infinite alternate;
+        }
+        
+        @keyframes golden-glow {
+            from { text-shadow: 0 0 20px #ffd700; }
+            to { text-shadow: 0 0 30px #ffd700, 0 0 40px #ffd700; }
+        }
+        
+        .message-content {
+            color: #e5e7eb;
+            font-size: 1.3rem;
+        }
+        
+        .reset-btn {
+            background: linear-gradient(45deg, #dc2626, #b91c1c);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 10px;
+            font-family: 'Griffy', cursive;
+            font-size: 1.1rem;
+            cursor: pointer;
+            margin-top: 2rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(220, 38, 38, 0.3);
+        }
+        
+        .reset-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(220, 38, 38, 0.4);
+        }
+        
+        @media (max-width: 768px) {
+            .title {
+                font-size: 2rem;
+            }
+            
+            .brewing-area {
+                flex-direction: column;
+                gap: 2rem;
+            }
+            
+            .ingredients-panel {
+                min-width: 250px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="stars" id="stars"></div>
+    
+    <div class="container">
+        <h1 class="title">🌙 Adella Mambabarang 🌙</h1>
+        
+        <div class="brewing-area">
+            <div class="ingredients-panel">
+                <h2 class="ingredients-title">📜 Kasangkapan sa Barang</h2>
+                <div class="ingredients-list">
+                    <div class="ingredient" data-ingredient="hair">
+                        <div class="ingredient-icon">💇‍♀️</div>
+                        <div class="ingredient-name">Buhok ng Tomboy</div>
+                    </div>
+                    <div class="ingredient" data-ingredient="doll">
+                        <div class="ingredient-icon">🪆</div>
+                        <div class="ingredient-name">Kahoy ng Sampalok</div>
+                    </div>
+                    <div class="ingredient" data-ingredient="frog">
+                        <div class="ingredient-icon">🐸</div>
+                        <div class="ingredient-name">Palaka na may Asthma</div>
+                    </div>
+                    <div class="ingredient" data-ingredient="bone">
+                        <div class="ingredient-icon">🦴</div>
+                        <div class="ingredient-name">Buto ng Kabadong Bayawak</div>
+                    </div>
+                    <div class="ingredient" data-ingredient="spider">
+                        <div class="ingredient-icon">🕷️</div>
+                        <div class="ingredient-name">Gagamba na Malungkot</div>
+                    </div>
+                    <div class="ingredient" data-ingredient="mushroom">
+                        <div class="ingredient-icon">🍄</div>
+                        <div class="ingredient-name">Mushroom na De lata</div>
+                    </div>
+                    <div class="ingredient" data-ingredient="eye">
+                        <div class="ingredient-icon">👁️</div>
+                        <div class="ingredient-name">Mata ng Banlag na Kabayo</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="cauldron-area">
+                <div class="cauldron">
+                    <div class="potion" id="potion"></div>
+                    <div class="bubbles" id="bubbles"></div>
+                </div>
+                <div class="progress" id="progress">
+                    Buro ng Kasangkapan... 0/7
+                </div>
+            </div>
+        </div>
+        
+        <div class="message-reveal" id="messageReveal">
+            <h2 class="message-title">✨ Huling Barang ✨</h2>
+            <div class="message-content" id="messageContent">
+                <strong>Adella Mae, ang aking mortal na kaaway.</strong><br>
+                
+Pards — salamat sa unexpected friendship. You made this whole internship oddly fun, frustrating, challenging, and somehow... one for the books. You annoyed the hell out of me — and yet, I kept wanting to talk to you. Fight with you. Win against you (kahit talo ako most of the time). You never back down, and I hate how much I respect that.
+
+Tawag ko sa’yo mambabarang kasi parang may sumpa kang bitbit — hindi ko alam kung bakit kapag ikaw ang kaharap ko, gusto ko makipag-debate, pero gusto ko ring makinig. Nakakainis, pero aminin na natin: may pagka-charming ‘yung asar mo.
+
+I admire how you carry yourself — confident but not arrogant, witty without trying, and always with something sharp to say. Pasikat ka boi hagshgashasg, pero aminado akong nakakabilib ka. You know when to lead, when to shut things down, and when to shut me up — and somehow, I don’t even mind.
+
+There were times I felt a gap between us. Maybe imagined, maybe real — but it made me curious. And that curiosity turned into admiration. You became a person I truly value, even if we spent most of our time lowkey competing or roasting each other for sport.
+
+Despite the short time, I saw something real in you — someone strong, capable, and bound to do great things. You have this quiet fire that makes people take notice, even if you pretend you don’t care. And that’s what makes you unforgettable.
+
+So good luck — sa research kemerut nyo, sa buhay-buhay, sa lahat ng susunod na laban. And pards, if you ever feel like trip mo manira ng tao, mambarang or manira ng mood, just message me. I’ll be waiting — armed with a comeback, and probably… coffee.
+
+I appreciate you. I’m proud of you. And lab na lab ko kayo kahit mga tangahin kayo.
+This is goodbye for now, Pards.
+
+Don’t be a stranger.
+Pakyu. (Pero pakyu na may pagmamahal.)
+                </div>
+        <div class="quote-box">
+    <p>
+        “Maybe in another lifetime, we’d still argue about nonsense.<br>
+        I’d still call you <em>mambabarang / Ulile</em>,<br>
+        and you’d still roll your eyes at me<br>
+        like I’m the dumbest genius you know.<br><br>
+        But for now — thank you<br>
+        for crossing paths with me in this one.<br>
+        You were the plot twist I didn’t see coming.”
+    </p>
+    <p style="margin-top: 1rem; font-weight: bold; color: #ffd700;">— MIKE</p>
+</div>
+
+</div>
+    </div>
+
+    <script>
+        let addedIngredients = 0;
+        const totalIngredients = 7;
+        let usedIngredients = new Set();
+        
+        // Create twinkling stars
+        function createStars() {
+            const starsContainer = document.getElementById('stars');
+            for (let i = 0; i < 50; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.width = Math.random() * 3 + 1 + 'px';
+                star.style.height = star.style.width;
+                star.style.animationDelay = Math.random() * 2 + 's';
+                starsContainer.appendChild(star);
+            }
+        }
+        
+        // Create bubbles
+        function createBubble() {
+            const bubblesContainer = document.getElementById('bubbles');
+            const bubble = document.createElement('div');
+            bubble.className = 'bubble';
+            bubble.style.left = Math.random() * 80 + 10 + '%';
+            bubble.style.width = Math.random() * 10 + 5 + 'px';
+            bubble.style.height = bubble.style.width;
+            bubble.style.animationDuration = Math.random() * 2 + 2 + 's';
+            bubblesContainer.appendChild(bubble);
+            
+            setTimeout(() => {
+                bubble.remove();
+            }, 4000);
+        }
+        
+        // Add ingredient to cauldron
+        function addIngredient(ingredientElement, ingredientType) {
+            if (usedIngredients.has(ingredientType)) return;
+            
+            usedIngredients.add(ingredientType);
+            ingredientElement.classList.add('added');
+            addedIngredients++;
+            
+            // Update potion level
+            const potion = document.getElementById('potion');
+            const potionHeight = (addedIngredients / totalIngredients) * 100;
+            potion.style.height = potionHeight + '%';
+            
+            // Update progress
+            const progress = document.getElementById('progress');
+            progress.textContent = `Brewing... ${addedIngredients}/${totalIngredients}`;
+            
+            // Start bubbling
+            if (addedIngredients === 1) {
+                setInterval(createBubble, 500);
+            }
+            
+            // Check if spell is complete
+            if (addedIngredients === totalIngredients) {
+                setTimeout(revealMessage, 2000);
+            }
+        }
+        
+        // Reveal the message
+        function revealMessage() {
+            const messageReveal = document.getElementById('messageReveal');
+            const progress = document.getElementById('progress');
+            
+            progress.textContent = '🎆 Spell Complete! 🎆';
+            progress.style.color = '#ffd700';
+            
+            setTimeout(() => {
+                messageReveal.style.display = 'block';
+                messageReveal.scrollIntoView({ behavior: 'smooth' });
+            }, 500);
+        }
+        
+        // Reset the spell
+        function resetSpell() {
+            addedIngredients = 0;
+            usedIngredients.clear();
+            
+            // Reset ingredients
+            document.querySelectorAll('.ingredient').forEach(ingredient => {
+                ingredient.classList.remove('added');
+            });
+            
+            // Reset potion
+            document.getElementById('potion').style.height = '0%';
+            
+            // Reset progress
+            const progress = document.getElementById('progress');
+            progress.textContent = 'Awaiting ingredients... 0/7';
+            progress.style.color = '#8b5cf6';
+            
+            // Hide message
+            document.getElementById('messageReveal').style.display = 'none';
+            
+            // Clear bubbles
+            document.getElementById('bubbles').innerHTML = '';
+            
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            createStars();
+            
+            // Add click listeners to ingredients
+            document.querySelectorAll('.ingredient').forEach(ingredient => {
+                ingredient.addEventListener('click', function() {
+                    const ingredientType = this.getAttribute('data-ingredient');
+                    addIngredient(this, ingredientType);
+                });
+            });
+        });
+    </script>
+</body>
+</html>
